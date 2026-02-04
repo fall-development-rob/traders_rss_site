@@ -336,11 +336,67 @@ This project uses Husky and commitlint for enforcing conventional commits:
 - **Deduplication**: Removes duplicate articles by ID
 - **Client Caching**: 5-minute localStorage cache with stale-while-revalidate
 
-## Deploy on Vercel
+## Deployment
+
+### Deploy on Vercel
 
 The easiest way to deploy this app is on [Vercel](https://vercel.com):
 
 [![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/traders-rss)
+
+### Deploy on Netlify
+
+You can also deploy this app on [Netlify](https://www.netlify.com):
+
+[![Deploy to Netlify](https://www.netlify.com/img/deploy/button.svg)](https://app.netlify.com/start/deploy?repository=https://github.com/yourusername/traders-rss)
+
+#### Manual Netlify Deployment
+
+1. **Connect your repository**
+   - Log in to [Netlify](https://app.netlify.com)
+   - Click "Add new site" > "Import an existing project"
+   - Connect your GitHub/GitLab/Bitbucket account
+   - Select the `traders-rss` repository
+
+2. **Configure build settings**
+   - **Build command**: `npm run build`
+   - **Publish directory**: `.next`
+   - **Node version**: 18 or higher (set in Environment variables)
+
+3. **Install the Next.js plugin**
+   - Netlify automatically detects Next.js projects and installs the `@netlify/plugin-nextjs` plugin
+   - This plugin handles SSR, API routes, and other Next.js features
+
+4. **Deploy**
+   - Click "Deploy site"
+   - Netlify will build and deploy your application
+
+#### Environment Variables
+
+Set these environment variables in Netlify (Site settings > Environment variables):
+
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `NODE_VERSION` | Node.js version (e.g., `18`) | Recommended |
+| `NPM_FLAGS` | npm flags (e.g., `--legacy-peer-deps` if needed) | Optional |
+
+> **Note**: This application does not require any secret API keys. All RSS feeds are public and fetched server-side through the Next.js API routes.
+
+#### Netlify Configuration File (Optional)
+
+For more control, create a `netlify.toml` file in your project root:
+
+```toml
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
+```
 
 ## License
 
