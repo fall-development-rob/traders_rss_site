@@ -71,7 +71,7 @@ export default function Home() {
 
   const renderFeedContent = () => {
     if (error) {
-      return <ErrorState message={error.message || "Failed to load feed items. Please try again later."} />;
+      return <ErrorState message={error || "Failed to load feed items. Please try again later."} />;
     }
 
     if (isLoading) {

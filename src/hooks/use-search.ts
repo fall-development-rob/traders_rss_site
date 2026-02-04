@@ -91,7 +91,6 @@ export function useSearch({
   const clearQuery = useCallback(() => {
     setQueryInternal('');
     setDebouncedQuery('');
-    setIsSearching(false);
     if (debounceTimerRef.current) {
       clearTimeout(debounceTimerRef.current);
     }
