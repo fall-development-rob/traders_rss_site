@@ -1,9 +1,11 @@
 /**
  * Market Data Service
  *
- * Fetches real-time market data from Yahoo Finance API for major indices.
- * Uses the free v8 chart endpoint to get current prices and daily changes.
+ * Fetches real-time market data from Yahoo Finance using the yahoo-finance2 package.
+ * Provides current prices and daily changes for major indices.
  */
+
+import YahooFinance from 'yahoo-finance2';
 
 export interface MarketQuote {
   symbol: string;
@@ -13,34 +15,6 @@ export interface MarketQuote {
   changePercent: number;
   isUp: boolean;
   previousClose: number;
-}
-
-interface YahooChartResult {
-  chart: {
-    result: Array<{
-      meta: {
-        symbol: string;
-        regularMarketPrice: number;
-        previousClose: number;
-        currency: string;
-        exchangeName: string;
-      };
-      timestamp?: number[];
-      indicators: {
-        quote: Array<{
-          close: (number | null)[];
-          open: (number | null)[];
-          high: (number | null)[];
-          low: (number | null)[];
-          volume: (number | null)[];
-        }>;
-      };
-    }> | null;
-    error: {
-      code: string;
-      description: string;
-    } | null;
-  };
 }
 
 /**
@@ -54,15 +28,8 @@ export const MARKET_SYMBOLS = [
   { symbol: '^VIX', name: 'Volatility' },
 ] as const;
 
-/**
- * Yahoo Finance API base URL
- */
-const YAHOO_FINANCE_BASE_URL = 'https://query1.finance.yahoo.com/v8/finance/chart';
-
-/**
- * Request timeout in milliseconds
- */
-const REQUEST_TIMEOUT = 5000;
+// Create Yahoo Finance instance (v3 API)
+const yahooFinance = new YahooFinance({ suppressNotices: ['yahooSurvey'] });
 
 /**
  * Fetches a single market quote from Yahoo Finance
@@ -76,61 +43,25 @@ export async function fetchMarketQuote(
   name: string
 ): Promise<MarketQuote | null> {
   try {
-    const encodedSymbol = encodeURIComponent(symbol);
-    const url = `${YAHOO_FINANCE_BASE_URL}/${encodedSymbol}?interval=1d&range=1d`;
+    const quote = await yahooFinance.quote(symbol);
 
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-
-    const response = await fetch(url, {
-      method: 'GET',
-      headers: {
-        'User-Agent': 'TradersRSS/1.0 (Market Data Aggregator)',
-        'Accept': 'application/json',
-      },
-      signal: controller.signal,
-    });
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      console.error(`Failed to fetch ${symbol}: HTTP ${response.status}`);
-      return null;
-    }
-
-    const data: YahooChartResult = await response.json();
-
-    // Validate response structure
-    if (data.chart.error) {
-      console.error(`Yahoo Finance API error for ${symbol}:`, data.chart.error.description);
-      return null;
-    }
-
-    if (!data.chart.result || data.chart.result.length === 0) {
-      console.error(`No data returned for ${symbol}`);
-      return null;
-    }
-
-    const result = data.chart.result[0];
-    const meta = result.meta;
-
-    // Extract price data
-    const currentPrice = meta.regularMarketPrice;
-    const previousClose = meta.previousClose;
-
-    // Validate we have required data
-    if (currentPrice === undefined || previousClose === undefined) {
+    if (!quote || typeof quote.regularMarketPrice !== 'number' || typeof quote.regularMarketPreviousClose !== 'number') {
       console.error(`Missing price data for ${symbol}`);
       return null;
     }
 
-    // Calculate change and percentage
-    const change = currentPrice - previousClose;
-    const changePercent = (change / previousClose) * 100;
+    const currentPrice = quote.regularMarketPrice;
+    const previousClose = quote.regularMarketPreviousClose;
+    const change = typeof quote.regularMarketChange === 'number'
+      ? quote.regularMarketChange
+      : (currentPrice - previousClose);
+    const changePercent = typeof quote.regularMarketChangePercent === 'number'
+      ? quote.regularMarketChangePercent
+      : ((change / previousClose) * 100);
     const isUp = change >= 0;
 
     return {
-      symbol: symbol.replace('^', ''), // Clean up symbol for display
+      symbol: symbol.replace('^', ''),
       name,
       price: roundToDecimal(currentPrice, 2),
       change: roundToDecimal(change, 2),
@@ -140,11 +71,7 @@ export async function fetchMarketQuote(
     };
   } catch (error) {
     if (error instanceof Error) {
-      if (error.name === 'AbortError') {
-        console.error(`Request timeout for ${symbol}`);
-      } else {
-        console.error(`Error fetching ${symbol}:`, error.message);
-      }
+      console.error(`Error fetching ${symbol}:`, error.message);
     } else {
       console.error(`Unknown error fetching ${symbol}:`, error);
     }
