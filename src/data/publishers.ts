@@ -151,32 +151,6 @@ export const publishers: Publisher[] = [
     website: 'https://www.db.com',
   },
 
-  // PROP_TRADING
-  {
-    id: 'janestreet',
-    name: 'Jane Street',
-    shortName: 'JS',
-    category: 'PROP_TRADING',
-    brandColor: '#1E3A5F',
-    website: 'https://www.janestreet.com',
-  },
-  {
-    id: 'virtu',
-    name: 'Virtu Financial',
-    shortName: 'Virtu',
-    category: 'PROP_TRADING',
-    brandColor: '#00AEEF',
-    website: 'https://www.virtu.com',
-  },
-  {
-    id: 'citadel',
-    name: 'Citadel',
-    shortName: 'Citadel',
-    category: 'PROP_TRADING',
-    brandColor: '#1C1C1C',
-    website: 'https://www.citadel.com',
-  },
-
   // REGULATOR
   {
     id: 'federalreserve',

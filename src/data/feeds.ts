@@ -472,6 +472,56 @@ export const feedSources: FeedSource[] = [
     feedCategory: 'MARKET_COMMENTARY',
     isActive: true,
   },
+
+  // Vanguard
+  {
+    id: 'vanguard-news',
+    publisherId: 'vanguard',
+    name: 'Vanguard News',
+    url: 'https://pressroom.vanguard.com/rss/news.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // Fidelity
+  {
+    id: 'fidelity-news',
+    publisherId: 'fidelity',
+    name: 'Fidelity News Releases',
+    url: 'https://newsroom.fidelity.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // Charles Schwab
+  {
+    id: 'schwab-news',
+    publisherId: 'schwab',
+    name: 'Schwab Press Releases',
+    url: 'https://pressroom.aboutschwab.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // Bank of America
+  {
+    id: 'bofa-newsroom',
+    publisherId: 'bofa',
+    name: 'Bank of America Newsroom',
+    url: 'https://newsroom.bankofamerica.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // Moody's
+  {
+    id: 'moodys-research',
+    publisherId: 'moodys',
+    name: "Moody's Research",
+    url: 'https://www.moodys.com/rss/rss.ashx',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
 ];
 
 export const getFeedsByPublisher = (publisherId: string): FeedSource[] => {
