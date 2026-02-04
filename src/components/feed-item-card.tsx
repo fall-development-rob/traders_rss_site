@@ -1,0 +1,64 @@
+"use client";
+
+import * as React from "react";
+import { formatDistanceToNow } from "date-fns";
+import { ExternalLink } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+import type { FeedItem } from "@/types";
+
+interface FeedItemCardProps {
+  item: FeedItem;
+  className?: string;
+}
+
+export function FeedItemCard({ item, className }: FeedItemCardProps) {
+  const relativeTime = React.useMemo(() => {
+    return formatDistanceToNow(new Date(item.publishedAt), {
+      addSuffix: true,
+    });
+  }, [item.publishedAt]);
+
+  return (
+    <article
+      className={cn(
+        "group relative py-3 px-4 transition-colors hover:bg-muted/50 dark:hover:bg-slate-800/50",
+        "border-b border-border/50 last:border-b-0",
+        className
+      )}
+    >
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block focus:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 rounded-sm"
+      >
+        {/* Title */}
+        <h3 className="text-sm font-medium leading-snug text-foreground group-hover:text-primary transition-colors line-clamp-2">
+          {item.title}
+          <ExternalLink className="inline-block ml-1.5 h-3 w-3 opacity-0 group-hover:opacity-50 transition-opacity" />
+        </h3>
+
+        {/* Summary */}
+        {item.summary && (
+          <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2 leading-relaxed">
+            {item.summary}
+          </p>
+        )}
+
+        {/* Meta row */}
+        <div className="mt-2 flex items-center gap-2 text-xs text-muted-foreground">
+          <time dateTime={new Date(item.publishedAt).toISOString()}>
+            {relativeTime}
+          </time>
+          {item.author && (
+            <>
+              <span className="text-border">|</span>
+              <span className="truncate max-w-[150px]">{item.author}</span>
+            </>
+          )}
+        </div>
+      </a>
+    </article>
+  );
+}
