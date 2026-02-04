@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { Header } from "@/components/Header";
 import { FilterBar } from "@/components/FilterBar";
 import { PublisherSection } from "@/components/PublisherSection";
@@ -64,6 +65,7 @@ export default function Home() {
                       key={publisherId}
                       publisher={publisher}
                       items={items}
+                      itemLimit={5}
                     />
                   );
                 }
@@ -86,24 +88,24 @@ export default function Home() {
               TradersRSS - Financial news aggregated from trusted sources.
             </p>
             <div className="flex items-center gap-4">
-              <a
-                href="#"
+              <Link
+                href="/about"
                 className="hover:text-foreground transition-colors"
               >
                 About
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/privacy"
                 className="hover:text-foreground transition-colors"
               >
                 Privacy
-              </a>
-              <a
-                href="#"
+              </Link>
+              <Link
+                href="/terms"
                 className="hover:text-foreground transition-colors"
               >
                 Terms
-              </a>
+              </Link>
             </div>
           </div>
         </div>

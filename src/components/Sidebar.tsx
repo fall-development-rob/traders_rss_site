@@ -1,9 +1,10 @@
 "use client";
 
+import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { TrendingUp, TrendingDown, Minus, Clock, Newspaper } from "lucide-react";
+import { TrendingUp, TrendingDown, Minus, Clock, Newspaper, Building2, Users, ExternalLink } from "lucide-react";
 import { publishers } from "@/data/publishers";
 import { categoryLabels } from "@/hooks/useFeeds";
 import type { PublisherCategory } from "@/types";
@@ -25,6 +26,11 @@ const trendingTopics = [
   { tag: "Interest Rates", count: 12 },
   { tag: "Tech Stocks", count: 10 },
 ];
+
+// Get unique categories that have publishers
+const categoriesWithPublishers = Array.from(
+  new Set(publishers.map((p) => p.category))
+).filter((cat) => categoryLabels[cat]) as PublisherCategory[];
 
 function MarketTicker() {
   return (
@@ -100,7 +106,7 @@ function TrendingTopics() {
   );
 }
 
-function PublisherStats() {
+function CategoryLinks() {
   // Group publishers by category and count
   const categoryStats = publishers.reduce((acc, pub) => {
     acc[pub.category] = (acc[pub.category] || 0) + 1;
@@ -111,22 +117,81 @@ function PublisherStats() {
     <Card>
       <CardHeader className="pb-2">
         <CardTitle className="text-sm font-semibold flex items-center gap-2">
-          <Clock className="h-4 w-4" />
-          Sources by Category
+          <Building2 className="h-4 w-4" />
+          Browse by Category
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-2">
-        {Object.entries(categoryStats).map(([category, count]) => (
-          <div
+      <CardContent className="space-y-1">
+        {categoriesWithPublishers.map((category) => (
+          <Link
             key={category}
-            className="flex items-center justify-between py-1 border-b border-border/50 last:border-0"
+            href={`/category/${category}`}
+            className="flex items-center justify-between py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors group"
           >
-            <span className="text-sm">{categoryLabels[category as PublisherCategory]}</span>
-            <Badge variant="outline" className="text-xs">
-              {count}
+            <span className="text-sm group-hover:text-primary transition-colors">
+              {categoryLabels[category]}
+            </span>
+            <Badge variant="secondary" className="text-xs">
+              {categoryStats[category] || 0} sources
             </Badge>
+          </Link>
+        ))}
+      </CardContent>
+    </Card>
+  );
+}
+
+function ActivePublishers() {
+  // Sort publishers alphabetically and group by category for display
+  const sortedPublishers = [...publishers].sort((a, b) =>
+    a.name.localeCompare(b.name)
+  );
+
+  // Take first 12 publishers to show
+  const displayedPublishers = sortedPublishers.slice(0, 12);
+  const remainingCount = sortedPublishers.length - displayedPublishers.length;
+
+  return (
+    <Card>
+      <CardHeader className="pb-2">
+        <CardTitle className="text-sm font-semibold flex items-center gap-2">
+          <Users className="h-4 w-4" />
+          Active Publishers
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-1">
+        {displayedPublishers.map((publisher) => (
+          <div
+            key={publisher.id}
+            className="flex items-center justify-between py-1.5 px-2 rounded-md hover:bg-muted/50 transition-colors group"
+          >
+            <div className="flex items-center gap-2 min-w-0">
+              <div
+                className="w-2 h-2 rounded-full flex-shrink-0"
+                style={{ backgroundColor: publisher.brandColor || '#6b7280' }}
+              />
+              <span className="text-sm truncate" title={publisher.name}>
+                {publisher.shortName || publisher.name}
+              </span>
+            </div>
+            <a
+              href={publisher.website}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="opacity-0 group-hover:opacity-100 transition-opacity"
+              title={`Visit ${publisher.name}`}
+            >
+              <ExternalLink className="h-3 w-3 text-muted-foreground hover:text-primary" />
+            </a>
           </div>
         ))}
+        {remainingCount > 0 && (
+          <div className="pt-2 text-center">
+            <span className="text-xs text-muted-foreground">
+              +{remainingCount} more publishers
+            </span>
+          </div>
+        )}
       </CardContent>
     </Card>
   );
@@ -136,8 +201,9 @@ export function Sidebar() {
   return (
     <div className="space-y-4 sticky top-36">
       <MarketTicker />
+      <CategoryLinks />
+      <ActivePublishers />
       <TrendingTopics />
-      <PublisherStats />
     </div>
   );
 }

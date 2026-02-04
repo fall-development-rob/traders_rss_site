@@ -1,9 +1,21 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useMemo, useCallback, useRef } from 'react';
 import type { FeedItem, FilterState, Publisher, PublisherCategory } from '../types';
-import { feedItems } from '../data/feedItems';
 import { publishers, getPublisherById } from '../data/publishers';
+
+interface ApiFeedItem {
+  id: string;
+  feedSourceId: string;
+  publisherId: string;
+  title: string;
+  summary: string;
+  url: string;
+  publishedAt: string;
+  author?: string;
+  thumbnailUrl?: string;
+  categories?: string[];
+}
 
 interface UseFeedsReturn {
   items: FeedItem[];
@@ -16,6 +28,8 @@ interface UseFeedsReturn {
   groupedByPublisher: Map<string, FeedItem[]>;
   totalItems: number;
   filteredCount: number;
+  refresh: () => Promise<void>;
+  lastUpdated: Date | null;
 }
 
 const defaultFilters: FilterState = {
@@ -24,18 +38,127 @@ const defaultFilters: FilterState = {
   searchQuery: '',
 };
 
+// Cache configuration
+const CACHE_KEY = 'tradersrss_feeds_cache';
+const CACHE_TTL_MS = 5 * 60 * 1000; // 5 minutes
+
+interface CacheData {
+  items: ApiFeedItem[];
+  timestamp: number;
+}
+
+function getCachedData(): CacheData | null {
+  if (typeof window === 'undefined') return null;
+  try {
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (!cached) return null;
+    return JSON.parse(cached) as CacheData;
+  } catch {
+    return null;
+  }
+}
+
+function setCachedData(items: ApiFeedItem[]): void {
+  if (typeof window === 'undefined') return;
+  try {
+    const cacheData: CacheData = {
+      items,
+      timestamp: Date.now(),
+    };
+    localStorage.setItem(CACHE_KEY, JSON.stringify(cacheData));
+  } catch (e) {
+    console.warn('Failed to cache feed data:', e);
+  }
+}
+
+function isCacheValid(cache: CacheData | null): boolean {
+  if (!cache) return false;
+  return Date.now() - cache.timestamp < CACHE_TTL_MS;
+}
+
 export function useFeeds(): UseFeedsReturn {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [filters, setFilters] = useState<FilterState>(defaultFilters);
+  const [feedItems, setFeedItems] = useState<FeedItem[]>([]);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const isFetching = useRef(false);
 
-  // Simulate loading state
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoading(false);
-    }, 800);
-    return () => clearTimeout(timer);
+  // Convert API items to FeedItems with Date objects
+  const convertToFeedItems = useCallback((data: ApiFeedItem[]): FeedItem[] => {
+    return data.map((item) => ({
+      ...item,
+      publishedAt: new Date(item.publishedAt),
+    }));
   }, []);
+
+  // Fetch feed items from API
+  const fetchFeeds = useCallback(async (useCache = true) => {
+    // Prevent concurrent fetches
+    if (isFetching.current) return;
+    isFetching.current = true;
+
+    // Check cache first (stale-while-revalidate pattern)
+    if (useCache) {
+      const cached = getCachedData();
+      if (cached && cached.items.length > 0) {
+        // Use cached data immediately
+        setFeedItems(convertToFeedItems(cached.items));
+        setLastUpdated(new Date(cached.timestamp));
+
+        // If cache is still valid, don't fetch
+        if (isCacheValid(cached)) {
+          setIsLoading(false);
+          isFetching.current = false;
+          return;
+        }
+        // Cache is stale - continue to fetch in background
+        setIsLoading(false);
+      }
+    }
+
+    if (!useCache || feedItems.length === 0) {
+      setIsLoading(true);
+    }
+    setError(null);
+
+    try {
+      const response = await fetch('/api/feeds');
+
+      if (!response.ok) {
+        throw new Error(`Failed to fetch feeds: ${response.status} ${response.statusText}`);
+      }
+
+      const data: ApiFeedItem[] = await response.json();
+
+      // Cache the response
+      setCachedData(data);
+
+      // Convert and set items
+      setFeedItems(convertToFeedItems(data));
+      setLastUpdated(new Date());
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'An unknown error occurred';
+      // Only set error if we don't have cached data
+      if (feedItems.length === 0) {
+        setError(errorMessage);
+      }
+      console.error('Error fetching feeds:', err);
+    } finally {
+      setIsLoading(false);
+      isFetching.current = false;
+    }
+  }, [convertToFeedItems, feedItems.length]);
+
+  // Manual refresh function (bypasses cache)
+  const refresh = useCallback(async () => {
+    await fetchFeeds(false);
+  }, [fetchFeeds]);
+
+  // Initial fetch on mount
+  useEffect(() => {
+    fetchFeeds(true);
+  }, [fetchFeeds]);
 
   const updateFilter = useCallback(<K extends keyof FilterState>(
     key: K,
@@ -89,7 +212,7 @@ export function useFeeds(): UseFeedsReturn {
     return result.sort(
       (a, b) => b.publishedAt.getTime() - a.publishedAt.getTime()
     );
-  }, [filters]);
+  }, [feedItems, filters]);
 
   // Group items by publisher
   const groupedByPublisher = useMemo(() => {
@@ -137,6 +260,8 @@ export function useFeeds(): UseFeedsReturn {
     groupedByPublisher,
     totalItems: feedItems.length,
     filteredCount: filteredItems.length,
+    refresh,
+    lastUpdated,
   };
 }
 

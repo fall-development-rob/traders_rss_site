@@ -150,6 +150,22 @@ export const feedSources: FeedSource[] = [
     feedCategory: 'REGULATORY',
     isActive: true,
   },
+  {
+    id: 'fed-monetary-policy',
+    publisherId: 'federalreserve',
+    name: 'Fed Monetary Policy',
+    url: 'https://www.federalreserve.gov/feeds/press_monetary.xml',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+  {
+    id: 'fed-feds-notes',
+    publisherId: 'federalreserve',
+    name: 'Fed FEDS Notes',
+    url: 'https://www.federalreserve.gov/feeds/feds_notes.xml',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
 
   // SEC
   {
@@ -186,6 +202,64 @@ export const feedSources: FeedSource[] = [
     feedCategory: 'PRESS_RELEASE',
     isActive: true,
   },
+  {
+    id: 'cftc-enforcement',
+    publisherId: 'cftc',
+    name: 'CFTC Enforcement',
+    url: 'https://www.cftc.gov/RSS/RSSENF/rssenf.xml',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+
+  // FDIC
+  {
+    id: 'fdic-news',
+    publisherId: 'fdic',
+    name: 'FDIC News',
+    url: 'https://public.govdelivery.com/topics/USFDIC_26/feed.rss',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+
+  // OCC
+  {
+    id: 'occ-news',
+    publisherId: 'occ',
+    name: 'OCC News',
+    url: 'https://www.comptrollerofthecurrency.gov/rss/occ_news.xml',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+
+  // Treasury
+  {
+    id: 'treasury-securities',
+    publisherId: 'treasury',
+    name: 'Treasury Securities Announced',
+    url: 'https://treasurydirect.gov/TA_WS/securities/announced/rss',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+
+  // ECB
+  {
+    id: 'ecb-press',
+    publisherId: 'ecb',
+    name: 'ECB Press Releases',
+    url: 'https://www.ecb.europa.eu/rss/press.html',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
+
+  // Bank of England
+  {
+    id: 'boe-news',
+    publisherId: 'boe',
+    name: 'Bank of England News',
+    url: 'https://www.bankofengland.co.uk/rss/news',
+    feedCategory: 'REGULATORY',
+    isActive: true,
+  },
 
   // PIMCO
   {
@@ -216,6 +290,14 @@ export const feedSources: FeedSource[] = [
     feedCategory: 'RESEARCH',
     isActive: true,
   },
+  {
+    id: 'gs-exchanges-podcast',
+    publisherId: 'goldmansachs',
+    name: 'Goldman Sachs Exchanges Podcast',
+    url: 'https://feeds.megaphone.fm/GLD9218176758',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
 
   // JP Morgan
   {
@@ -223,6 +305,50 @@ export const feedSources: FeedSource[] = [
     publisherId: 'jpmorgan',
     name: 'JP Morgan Insights',
     url: 'https://www.jpmorgan.com/insights/rss/feed.xml',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
+  {
+    id: 'jpm-news-releases',
+    publisherId: 'jpmorgan',
+    name: 'JPMorgan Chase News Releases',
+    url: 'https://jpmorganchaseco.gcs-web.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+  {
+    id: 'jpm-at-any-rate-podcast',
+    publisherId: 'jpmorgan',
+    name: 'J.P. Morgan At Any Rate Podcast',
+    url: 'https://feed.podbean.com/atanyrate/feed.xml',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
+
+  // Morgan Stanley
+  {
+    id: 'ms-press-releases',
+    publisherId: 'morganstanley',
+    name: 'Morgan Stanley Press Releases',
+    url: 'https://www.morganstanley.com/press-releases.msfeed.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+  {
+    id: 'ms-thoughts-on-market-podcast',
+    publisherId: 'morganstanley',
+    name: 'Morgan Stanley Thoughts on the Market Podcast',
+    url: 'https://rss.art19.com/thoughts-on-the-market',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
+
+  // Deutsche Bank
+  {
+    id: 'db-research',
+    publisherId: 'deutschebank',
+    name: 'Deutsche Bank Research',
+    url: 'https://www.dbresearch.com/PROD/RPS_EN-PROD/RSS_GROUP_HOME_EN.calias',
     feedCategory: 'RESEARCH',
     isActive: true,
   },
@@ -295,6 +421,54 @@ export const feedSources: FeedSource[] = [
     publisherId: 'wsj',
     name: 'WSJ Opinion',
     url: 'https://feeds.a.dj.com/rss/RSSOpinion.xml',
+    feedCategory: 'MARKET_COMMENTARY',
+    isActive: true,
+  },
+
+  // T. Rowe Price
+  {
+    id: 'troweprice-news',
+    publisherId: 'troweprice',
+    name: 'T. Rowe Price News',
+    url: 'https://investors.troweprice.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // Artisan Partners
+  {
+    id: 'artisan-news',
+    publisherId: 'artisan',
+    name: 'Artisan Partners News',
+    url: 'https://www.apam.com/rss/news-releases.xml',
+    feedCategory: 'NEWS',
+    isActive: true,
+  },
+
+  // VanEck
+  {
+    id: 'vaneck-insights',
+    publisherId: 'vaneck',
+    name: 'VanEck Insights',
+    url: 'https://www.vaneck.com/nl/en/news-and-insights/blog/blog-rss',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
+
+  // Advisor Perspectives
+  {
+    id: 'advisorperspectives-content',
+    publisherId: 'advisorperspectives',
+    name: 'Advisor Perspectives',
+    url: 'https://www.advisorperspectives.com/content.rss',
+    feedCategory: 'RESEARCH',
+    isActive: true,
+  },
+  {
+    id: 'advisorperspectives-commentaries',
+    publisherId: 'advisorperspectives',
+    name: 'Advisor Perspectives Commentaries',
+    url: 'https://www.advisorperspectives.com/commentaries.rss',
     feedCategory: 'MARKET_COMMENTARY',
     isActive: true,
   },

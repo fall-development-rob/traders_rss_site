@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { Moon, Sun, Search, Menu, TrendingUp } from "lucide-react";
 import { Sheet, SheetContent, SheetTrigger } from "@/components/ui/sheet";
 import { useState } from "react";
+import Link from "next/link";
 
 interface HeaderProps {
   onSearch?: (query: string) => void;
@@ -40,18 +41,18 @@ export function Header({ onSearch, searchValue = "" }: HeaderProps) {
             </SheetTrigger>
             <SheetContent side="left" className="w-80">
               <nav className="flex flex-col gap-4 mt-8">
-                <a href="#" className="text-lg font-medium hover:text-primary transition-colors">
+                <Link href="/category/NEWS" className="text-lg font-medium hover:text-primary transition-colors">
                   Markets
-                </a>
-                <a href="#" className="text-lg font-medium hover:text-primary transition-colors">
+                </Link>
+                <Link href="/category/RESEARCH" className="text-lg font-medium hover:text-primary transition-colors">
                   Research
-                </a>
-                <a href="#" className="text-lg font-medium hover:text-primary transition-colors">
+                </Link>
+                <Link href="/category/REGULATOR" className="text-lg font-medium hover:text-primary transition-colors">
                   Regulatory
-                </a>
-                <a href="#" className="text-lg font-medium hover:text-primary transition-colors">
+                </Link>
+                <Link href="/category/ASSET_MANAGER" className="text-lg font-medium hover:text-primary transition-colors">
                   Commentary
-                </a>
+                </Link>
               </nav>
             </SheetContent>
           </Sheet>
@@ -68,30 +69,30 @@ export function Header({ onSearch, searchValue = "" }: HeaderProps) {
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-6">
-          <a
-            href="#"
+          <Link
+            href="/category/NEWS"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Markets
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/category/RESEARCH"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Research
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/category/REGULATOR"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Regulatory
-          </a>
-          <a
-            href="#"
+          </Link>
+          <Link
+            href="/category/ASSET_MANAGER"
             className="text-sm font-medium text-muted-foreground hover:text-foreground transition-colors"
           >
             Commentary
-          </a>
+          </Link>
         </nav>
 
         {/* Search and Actions */}

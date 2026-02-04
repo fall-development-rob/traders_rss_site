@@ -142,6 +142,14 @@ export const publishers: Publisher[] = [
     brandColor: '#E31837',
     website: 'https://www.bankofamerica.com',
   },
+  {
+    id: 'deutschebank',
+    name: 'Deutsche Bank',
+    shortName: 'DB',
+    category: 'BANK',
+    brandColor: '#0018A8',
+    website: 'https://www.db.com',
+  },
 
   // PROP_TRADING
   {
@@ -194,6 +202,46 @@ export const publishers: Publisher[] = [
     brandColor: '#003366',
     website: 'https://www.cftc.gov',
   },
+  {
+    id: 'fdic',
+    name: 'FDIC',
+    shortName: 'FDIC',
+    category: 'REGULATOR',
+    brandColor: '#004C97',
+    website: 'https://www.fdic.gov',
+  },
+  {
+    id: 'occ',
+    name: 'Office of the Comptroller',
+    shortName: 'OCC',
+    category: 'REGULATOR',
+    brandColor: '#003366',
+    website: 'https://www.occ.gov',
+  },
+  {
+    id: 'treasury',
+    name: 'U.S. Treasury',
+    shortName: 'Treasury',
+    category: 'REGULATOR',
+    brandColor: '#002868',
+    website: 'https://www.treasury.gov',
+  },
+  {
+    id: 'ecb',
+    name: 'European Central Bank',
+    shortName: 'ECB',
+    category: 'REGULATOR',
+    brandColor: '#003399',
+    website: 'https://www.ecb.europa.eu',
+  },
+  {
+    id: 'boe',
+    name: 'Bank of England',
+    shortName: 'BoE',
+    category: 'REGULATOR',
+    brandColor: '#AC145A',
+    website: 'https://www.bankofengland.co.uk',
+  },
 
   // RESEARCH
   {
@@ -219,6 +267,40 @@ export const publishers: Publisher[] = [
     category: 'RESEARCH',
     brandColor: '#002855',
     website: 'https://www.moodys.com',
+  },
+  {
+    id: 'advisorperspectives',
+    name: 'Advisor Perspectives',
+    shortName: 'AP',
+    category: 'RESEARCH',
+    brandColor: '#1E3A5F',
+    website: 'https://www.advisorperspectives.com',
+  },
+
+  // ASSET_MANAGER (Additional)
+  {
+    id: 'troweprice',
+    name: 'T. Rowe Price',
+    shortName: 'T.Rowe',
+    category: 'ASSET_MANAGER',
+    brandColor: '#00205B',
+    website: 'https://www.troweprice.com',
+  },
+  {
+    id: 'artisan',
+    name: 'Artisan Partners',
+    shortName: 'Artisan',
+    category: 'ASSET_MANAGER',
+    brandColor: '#1A1A1A',
+    website: 'https://www.artisanpartners.com',
+  },
+  {
+    id: 'vaneck',
+    name: 'VanEck',
+    shortName: 'VanEck',
+    category: 'ASSET_MANAGER',
+    brandColor: '#00263A',
+    website: 'https://www.vaneck.com',
   },
 ];
 
