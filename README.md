@@ -275,6 +275,54 @@ This project uses Husky and commitlint for enforcing conventional commits:
 | `build` | Build system changes |
 | `revert` | Revert previous commit |
 
+## Versioning and Releases
+
+This project uses [Changesets](https://github.com/changesets/changesets) for version management and changelog generation.
+
+### Adding a Changeset
+
+When making changes that should be included in the changelog, add a changeset:
+
+```bash
+npm run changeset
+```
+
+This will prompt you to:
+1. Select the type of version bump
+2. Write a summary of your changes
+
+### Version Bump Types
+
+| Type | When to Use |
+|------|-------------|
+| `patch` | Bug fixes, small changes that don't add features |
+| `minor` | New features, non-breaking changes |
+| `major` | Breaking changes that require users to update their code |
+
+### Release Workflow
+
+1. **Make changes**: Develop your feature or fix on a branch
+2. **Add changeset**: Run `npm run changeset` and describe your changes
+3. **Create PR**: Push your branch and open a pull request
+4. **Merge to main**: Once approved, merge your PR with the changeset
+5. **Version PR**: GitHub Actions automatically creates a "Version Packages" PR
+6. **Release**: Merging the Version Packages PR:
+   - Bumps the package version
+   - Updates CHANGELOG.md
+   - Creates a GitHub release automatically
+
+### CI Enforcement
+
+Changesets are **required** for pull requests. The CI pipeline will check that:
+- PRs include a changeset file, OR
+- PRs are explicitly marked as not requiring a changeset (for documentation-only changes, etc.)
+
+If your PR doesn't need a version bump (e.g., README updates), you can create an empty changeset:
+
+```bash
+npx changeset add --empty
+```
+
 ## Configuration
 
 ### Adding New RSS Feeds
