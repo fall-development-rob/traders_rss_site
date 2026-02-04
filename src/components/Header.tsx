@@ -57,14 +57,14 @@ export function Header({ onSearch, searchValue = "" }: HeaderProps) {
             </SheetContent>
           </Sheet>
 
-          <a href="/" className="flex items-center gap-2">
+          <Link href="/" className="flex items-center gap-2">
             <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
               <TrendingUp className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold tracking-tight hidden sm:inline-block">
               Traders<span className="text-accent-gold">RSS</span>
             </span>
-          </a>
+          </Link>
         </div>
 
         {/* Desktop Navigation */}

@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
 import { ExternalLink, Clock, User, ChevronRight } from "lucide-react";
 import type { FeedItem, Publisher } from "@/types";
 import { categoryLabels } from "@/hooks/useFeeds";

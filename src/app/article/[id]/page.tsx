@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import Link from "next/link";
 import Image from "next/image";
 import { format } from "date-fns";
@@ -20,7 +20,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { cn } from "@/lib/utils";
 import { getPublisherById } from "@/data/publishers";
 import { categoryLabels } from "@/hooks/useFeeds";
 import type { FeedItem, Publisher } from "@/types";
@@ -82,7 +81,6 @@ function RelatedArticleCard({ item }: { item: FeedItem }) {
 
 export default function ArticleDetailPage() {
   const params = useParams();
-  const router = useRouter();
   const articleId = params.id as string;
 
   const [article, setArticle] = useState<FeedItem | null>(null);

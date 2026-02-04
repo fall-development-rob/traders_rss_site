@@ -263,7 +263,6 @@ export async function fetchAllFeeds(feedSources: FeedSource[]): Promise<FetchAll
 
   const items: FeedItem[] = [];
   const errors: FeedError[] = [];
-  const sourceMap = new Map(sortedSources.map((s, i) => [i, s]));
 
   // Create fetch tasks
   const tasks = sortedSources.map((source, index) => async () => {

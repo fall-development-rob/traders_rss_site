@@ -3,8 +3,7 @@
 import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { Separator } from "@/components/ui/separator";
-import { TrendingUp, TrendingDown, Minus, Clock, Newspaper, Building2, Users, ExternalLink } from "lucide-react";
+import { TrendingUp, TrendingDown, Newspaper, Building2, Users, ExternalLink } from "lucide-react";
 import { publishers } from "@/data/publishers";
 import { categoryLabels } from "@/hooks/useFeeds";
 import type { PublisherCategory } from "@/types";

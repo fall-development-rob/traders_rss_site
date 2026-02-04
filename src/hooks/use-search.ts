@@ -46,14 +46,17 @@ export function useSearch({
 }: UseSearchOptions): UseSearchResult {
   const [query, setQueryInternal] = useState('');
   const [debouncedQuery, setDebouncedQuery] = useState('');
-  const [isSearching, setIsSearching] = useState(false);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    // Initialize from localStorage on first render
+    if (typeof window !== 'undefined') {
+      return getRecentSearches();
+    }
+    return [];
+  });
   const debounceTimerRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load recent searches on mount
-  useEffect(() => {
-    setRecentSearches(getRecentSearches());
-  }, []);
+  // Derive isSearching from query vs debouncedQuery
+  const isSearching = query !== debouncedQuery;
 
   // Debounce the search query
   useEffect(() => {
@@ -61,13 +64,8 @@ export function useSearch({
       clearTimeout(debounceTimerRef.current);
     }
 
-    if (query !== debouncedQuery) {
-      setIsSearching(true);
-    }
-
     debounceTimerRef.current = setTimeout(() => {
       setDebouncedQuery(query);
-      setIsSearching(false);
       onSearchChange?.(query);
     }, debounceMs);
 
@@ -76,7 +74,7 @@ export function useSearch({
         clearTimeout(debounceTimerRef.current);
       }
     };
-  }, [query, debounceMs, onSearchChange, debouncedQuery]);
+  }, [query, debounceMs, onSearchChange]);
 
   // Compute search results
   const results = useMemo(() => {
