@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo, useCallback } from "react";
+import { useState, useEffect, useMemo, useCallback, useRef, useId } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
 import { Card } from "@/components/ui/card";
@@ -99,23 +99,34 @@ function formatDate(date: Date): string {
 
 function Breadcrumb({ publisher }: { publisher: Publisher }) {
   return (
-    <nav className="flex items-center gap-2 text-sm text-muted-foreground mb-6">
-      <Link
-        href="/"
-        className="flex items-center gap-1 hover:text-foreground transition-colors"
-      >
-        <Home className="h-4 w-4" />
-        <span>Home</span>
-      </Link>
-      <ChevronRight className="h-4 w-4" />
-      <span className="text-foreground font-medium">{publisher.name}</span>
+    <nav
+      aria-label="Breadcrumb"
+      className="flex items-center gap-2 text-sm text-muted-foreground mb-6"
+    >
+      <ol className="flex items-center gap-2">
+        <li>
+          <Link
+            href="/"
+            className="flex items-center gap-1 hover:text-foreground transition-colors"
+          >
+            <Home className="h-4 w-4" aria-hidden="true" />
+            <span>Home</span>
+          </Link>
+        </li>
+        <li aria-hidden="true">
+          <ChevronRight className="h-4 w-4" />
+        </li>
+        <li aria-current="page">
+          <span className="text-foreground font-medium">{publisher.name}</span>
+        </li>
+      </ol>
     </nav>
   );
 }
 
 function ArchiveHeader({ publisher }: { publisher: Publisher }) {
   return (
-    <div
+    <header
       className="rounded-lg border p-6 mb-6"
       style={{
         borderLeftWidth: "4px",
@@ -127,6 +138,7 @@ function ArchiveHeader({ publisher }: { publisher: Publisher }) {
           <div
             className="flex h-14 w-14 items-center justify-center rounded-lg text-lg font-bold text-white shadow-sm"
             style={{ backgroundColor: publisher.brandColor || "#333" }}
+            aria-hidden="true"
           >
             {publisher.shortName?.slice(0, 2) || publisher.name.slice(0, 2)}
           </div>
@@ -146,58 +158,64 @@ function ArchiveHeader({ publisher }: { publisher: Publisher }) {
           className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors"
         >
           <span>Visit website</span>
-          <ExternalLink className="h-4 w-4" />
+          <ExternalLink className="h-4 w-4" aria-hidden="true" />
+          <span className="sr-only">(opens in new tab)</span>
         </a>
       </div>
-    </div>
+    </header>
   );
 }
 
 function ArticleCard({ item }: { item: FeedItem }) {
   return (
-    <a
-      href={item.url}
-      target="_blank"
-      rel="noopener noreferrer"
-      className="block group"
-    >
-      <div className="py-4 px-4 -mx-4 rounded-md transition-colors hover:bg-secondary/50">
-        <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <h3 className="font-medium text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
-              {item.title}
-            </h3>
-            {item.summary && (
-              <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
-                {item.summary}
-              </p>
-            )}
-            <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
-              <span className="flex items-center gap-1">
-                <Clock className="h-3 w-3" />
-                {formatTimeAgo(item.publishedAt)}
-              </span>
-              {item.author && (
-                <span className="flex items-center gap-1">
-                  <User className="h-3 w-3" />
-                  <span className="truncate max-w-[150px]">{item.author}</span>
-                </span>
+    <article>
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="block group"
+        aria-label={`${item.title} - Published ${formatDate(item.publishedAt)}${item.author ? ` by ${item.author}` : ''} (opens in new tab)`}
+      >
+        <div className="py-4 px-4 -mx-4 rounded-md transition-colors hover:bg-secondary/50">
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex-1 min-w-0">
+              <h2 className="font-medium text-sm leading-tight group-hover:text-primary transition-colors line-clamp-2">
+                {item.title}
+              </h2>
+              {item.summary && (
+                <p className="mt-1.5 text-xs text-muted-foreground line-clamp-2">
+                  {item.summary}
+                </p>
               )}
-              <span className="text-muted-foreground/60">
-                {formatDate(item.publishedAt)}
-              </span>
+              <div className="mt-2 flex items-center gap-3 text-xs text-muted-foreground">
+                <span className="flex items-center gap-1">
+                  <Clock className="h-3 w-3" aria-hidden="true" />
+                  <time dateTime={item.publishedAt.toISOString()}>
+                    {formatTimeAgo(item.publishedAt)}
+                  </time>
+                </span>
+                {item.author && (
+                  <span className="flex items-center gap-1">
+                    <User className="h-3 w-3" aria-hidden="true" />
+                    <span className="truncate max-w-[150px]">{item.author}</span>
+                  </span>
+                )}
+                <span className="text-muted-foreground/60" aria-hidden="true">
+                  {formatDate(item.publishedAt)}
+                </span>
+              </div>
             </div>
+            <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-1" aria-hidden="true" />
           </div>
-          <ExternalLink className="h-4 w-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0 mt-1" />
         </div>
-      </div>
-    </a>
+      </a>
+    </article>
   );
 }
 
 function ArticleSkeleton() {
   return (
-    <div className="py-4 px-4">
+    <div className="py-4 px-4" role="article" aria-hidden="true">
       <div className="space-y-2">
         <Skeleton className="h-4 w-full" />
         <Skeleton className="h-4 w-3/4" />
@@ -214,25 +232,26 @@ function ArticleSkeleton() {
 
 function LoadingSkeleton() {
   return (
-    <div className="min-h-screen bg-background">
+    <div className="min-h-screen bg-background" aria-busy="true" aria-live="polite">
+      <span className="sr-only">Loading publisher archive page...</span>
       {/* Header skeleton */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <Skeleton className="h-8 w-32" />
-          <Skeleton className="h-9 w-9 rounded-md" />
+          <Skeleton className="h-8 w-32" aria-hidden="true" />
+          <Skeleton className="h-9 w-9 rounded-md" aria-hidden="true" />
         </div>
       </header>
 
       <main className="container mx-auto px-4 py-6">
         {/* Breadcrumb skeleton */}
-        <div className="flex items-center gap-2 mb-6">
+        <div className="flex items-center gap-2 mb-6" aria-hidden="true">
           <Skeleton className="h-4 w-16" />
           <Skeleton className="h-4 w-4" />
           <Skeleton className="h-4 w-24" />
         </div>
 
         {/* Header card skeleton */}
-        <div className="rounded-lg border p-6 mb-6">
+        <div className="rounded-lg border p-6 mb-6" aria-hidden="true">
           <div className="flex items-center gap-4">
             <Skeleton className="h-14 w-14 rounded-lg" />
             <div className="space-y-2">
@@ -243,13 +262,13 @@ function LoadingSkeleton() {
         </div>
 
         {/* Filter bar skeleton */}
-        <div className="flex items-center gap-4 mb-6">
+        <div className="flex items-center gap-4 mb-6" aria-hidden="true">
           <Skeleton className="h-9 w-64" />
           <Skeleton className="h-9 w-32" />
         </div>
 
         {/* Articles skeleton */}
-        <Card>
+        <Card aria-hidden="true">
           <div className="divide-y divide-border/50">
             {[1, 2, 3, 4, 5].map((i) => (
               <ArticleSkeleton key={i} />
@@ -263,9 +282,13 @@ function LoadingSkeleton() {
 
 function EmptyState({ hasFilters }: { hasFilters: boolean }) {
   return (
-    <div className="flex flex-col items-center justify-center py-16 px-4 text-center">
-      <FileX2 className="h-12 w-12 text-muted-foreground mb-4" />
-      <h3 className="text-lg font-semibold mb-2">No articles found</h3>
+    <div
+      className="flex flex-col items-center justify-center py-16 px-4 text-center"
+      role="status"
+      aria-live="polite"
+    >
+      <FileX2 className="h-12 w-12 text-muted-foreground mb-4" aria-hidden="true" />
+      <h2 className="text-lg font-semibold mb-2">No articles found</h2>
       <p className="text-sm text-muted-foreground max-w-md">
         {hasFilters
           ? "No articles match your current filters. Try adjusting your search or date range."
@@ -277,15 +300,15 @@ function EmptyState({ hasFilters }: { hasFilters: boolean }) {
 
 function NotFoundState() {
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center">
-      <div className="text-center">
+    <div className="min-h-screen bg-background flex items-center justify-center" role="main">
+      <div className="text-center" role="alert">
         <h1 className="text-4xl font-bold mb-4">Publisher Not Found</h1>
         <p className="text-muted-foreground mb-6">
           The publisher you are looking for does not exist.
         </p>
         <Link href="/">
           <Button>
-            <Home className="h-4 w-4 mr-2" />
+            <Home className="h-4 w-4 mr-2" aria-hidden="true" />
             Return Home
           </Button>
         </Link>
@@ -318,6 +341,13 @@ export default function ArchivePage() {
   });
   const [displayCount, setDisplayCount] = useState(ITEMS_PER_PAGE);
   const [showScrollTop, setShowScrollTop] = useState(false);
+
+  // Refs and IDs for accessibility
+  const loadMoreRef = useRef<HTMLButtonElement>(null);
+  const articlesRegionRef = useRef<HTMLDivElement>(null);
+  const searchInputId = useId();
+  const startDateId = useId();
+  const endDateId = useId();
 
   const publisher = getPublisherById(publisherId);
 
@@ -431,7 +461,16 @@ export default function ArchivePage() {
 
   const handleLoadMore = useCallback(() => {
     setDisplayCount((prev) => prev + ITEMS_PER_PAGE);
-  }, []);
+    // Set focus to first new article after load for keyboard users
+    setTimeout(() => {
+      const articles = articlesRegionRef.current?.querySelectorAll('article');
+      if (articles && articles.length > displayCount) {
+        const firstNewArticle = articles[displayCount];
+        const link = firstNewArticle.querySelector('a');
+        link?.focus();
+      }
+    }, 100);
+  }, [displayCount]);
 
   const handleScrollToTop = useCallback(() => {
     window.scrollTo({ top: 0, behavior: "smooth" });
@@ -470,11 +509,19 @@ export default function ArchivePage() {
 
   return (
     <div className="min-h-screen bg-background">
+      {/* Skip to main content link */}
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-4 focus:left-4 focus:px-4 focus:py-2 focus:bg-primary focus:text-primary-foreground focus:rounded-md"
+      >
+        Skip to main content
+      </a>
+
       {/* Header */}
       <header className="sticky top-0 z-50 w-full border-b border-border/40 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="container mx-auto flex h-16 items-center justify-between px-4">
           <Link href="/" className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary" aria-hidden="true">
               <TrendingUp className="h-5 w-5 text-primary-foreground" />
             </div>
             <span className="text-xl font-bold tracking-tight hidden sm:inline-block">
@@ -487,15 +534,15 @@ export default function ArchivePage() {
             size="icon"
             onClick={() => setTheme(theme === "dark" ? "light" : "dark")}
             className="h-9 w-9"
+            aria-label={theme === "dark" ? "Switch to light theme" : "Switch to dark theme"}
           >
-            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" />
-            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" />
-            <span className="sr-only">Toggle theme</span>
+            <Sun className="h-4 w-4 rotate-0 scale-100 transition-all dark:-rotate-90 dark:scale-0" aria-hidden="true" />
+            <Moon className="absolute h-4 w-4 rotate-90 scale-0 transition-all dark:rotate-0 dark:scale-100" aria-hidden="true" />
           </Button>
         </div>
       </header>
 
-      <main className="container mx-auto px-4 py-6">
+      <main id="main-content" className="container mx-auto px-4 py-6" role="main">
         {/* Breadcrumb */}
         <Breadcrumb publisher={publisher} />
 
@@ -503,11 +550,15 @@ export default function ArchivePage() {
         <ArchiveHeader publisher={publisher} />
 
         {/* Filter Bar */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
+        <section aria-label="Search and filter options" className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-6">
           {/* Search */}
           <div className="relative flex-1 max-w-md">
-            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <label htmlFor={searchInputId} className="sr-only">
+              Search articles
+            </label>
+            <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" aria-hidden="true" />
             <Input
+              id={searchInputId}
               type="search"
               placeholder="Search articles..."
               className="pl-9 bg-secondary/50"
@@ -516,20 +567,26 @@ export default function ArchivePage() {
                 setSearchQuery(e.target.value);
                 setDisplayCount(ITEMS_PER_PAGE);
               }}
+              aria-describedby="results-count"
             />
           </div>
 
           {/* Date Filter Dropdown */}
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="min-w-[140px]">
-                <Calendar className="h-4 w-4 mr-2" />
+              <Button
+                variant="outline"
+                className="min-w-[140px]"
+                aria-label={`Filter by date: ${dateFilterLabels[dateFilter]}`}
+                aria-haspopup="menu"
+              >
+                <Calendar className="h-4 w-4 mr-2" aria-hidden="true" />
                 {dateFilterLabels[dateFilter]}
-                <ChevronDown className="h-4 w-4 ml-auto" />
+                <ChevronDown className="h-4 w-4 ml-auto" aria-hidden="true" />
               </Button>
             </DropdownMenuTrigger>
-            <DropdownMenuContent align="end" className="w-56">
-              <DropdownMenuLabel>Filter by Date</DropdownMenuLabel>
+            <DropdownMenuContent align="end" className="w-56" role="menu">
+              <DropdownMenuLabel id="date-filter-label">Filter by Date</DropdownMenuLabel>
               <DropdownMenuSeparator />
               {(Object.keys(dateFilterLabels) as DateFilter[])
                 .filter((key) => key !== "custom")
@@ -538,6 +595,8 @@ export default function ArchivePage() {
                     key={filter}
                     onClick={() => handleDateFilterChange(filter)}
                     className={dateFilter === filter ? "bg-accent" : ""}
+                    role="menuitemradio"
+                    aria-checked={dateFilter === filter}
                   >
                     {dateFilterLabels[filter]}
                   </DropdownMenuItem>
@@ -546,10 +605,13 @@ export default function ArchivePage() {
               <DropdownMenuLabel className="font-normal text-xs text-muted-foreground">
                 Custom Range
               </DropdownMenuLabel>
-              <div className="px-2 py-2 space-y-2">
+              <div className="px-2 py-2 space-y-2" role="group" aria-label="Custom date range">
                 <div>
-                  <label className="text-xs text-muted-foreground">From</label>
+                  <label htmlFor={startDateId} className="text-xs text-muted-foreground block mb-1">
+                    From date
+                  </label>
                   <Input
+                    id={startDateId}
                     type="date"
                     className="h-8 text-xs"
                     value={
@@ -560,11 +622,15 @@ export default function ArchivePage() {
                     onChange={(e) =>
                       handleCustomDateChange("start", e.target.value)
                     }
+                    aria-label="Start date for custom filter"
                   />
                 </div>
                 <div>
-                  <label className="text-xs text-muted-foreground">To</label>
+                  <label htmlFor={endDateId} className="text-xs text-muted-foreground block mb-1">
+                    To date
+                  </label>
                   <Input
+                    id={endDateId}
                     type="date"
                     className="h-8 text-xs"
                     value={
@@ -575,93 +641,114 @@ export default function ArchivePage() {
                     onChange={(e) =>
                       handleCustomDateChange("end", e.target.value)
                     }
+                    aria-label="End date for custom filter"
                   />
                 </div>
               </div>
             </DropdownMenuContent>
           </DropdownMenu>
 
-          {/* Results count */}
-          <div className="text-sm text-muted-foreground">
+          {/* Results count - live region for screen readers */}
+          <div
+            id="results-count"
+            className="text-sm text-muted-foreground"
+            role="status"
+            aria-live="polite"
+            aria-atomic="true"
+          >
             {filteredItems.length === items.length ? (
               <span>{items.length} articles</span>
             ) : (
               <span>
-                {filteredItems.length} of {items.length} articles
+                Showing {filteredItems.length} of {items.length} articles
               </span>
             )}
           </div>
-        </div>
+        </section>
 
         {/* Articles List */}
-        {error ? (
-          <Card className="p-6">
-            <div className="text-center text-destructive">
-              <p>Failed to load articles: {error}</p>
-              <Button
-                variant="outline"
-                className="mt-4"
-                onClick={() => window.location.reload()}
-              >
-                Try Again
-              </Button>
-            </div>
-          </Card>
-        ) : filteredItems.length === 0 ? (
-          <Card>
-            <EmptyState hasFilters={hasFilters} />
-          </Card>
-        ) : (
-          <Card className="overflow-hidden">
-            <div className="divide-y divide-border/50 px-4">
-              {displayedItems.map((item) => (
-                <ArticleCard key={item.id} item={item} />
-              ))}
-            </div>
-
-            {/* Load More Button */}
-            {hasMore && (
-              <div className="p-4 border-t border-border/50">
+        <section aria-label="Articles" ref={articlesRegionRef}>
+          {error ? (
+            <Card className="p-6" role="alert">
+              <div className="text-center text-destructive">
+                <p>Failed to load articles: {error}</p>
                 <Button
                   variant="outline"
-                  className="w-full"
-                  onClick={handleLoadMore}
+                  className="mt-4"
+                  onClick={() => window.location.reload()}
                 >
-                  Load More ({filteredItems.length - displayCount} remaining)
+                  Try Again
                 </Button>
               </div>
-            )}
-          </Card>
-        )}
+            </Card>
+          ) : filteredItems.length === 0 ? (
+            <Card>
+              <EmptyState hasFilters={hasFilters} />
+            </Card>
+          ) : (
+            <Card className="overflow-hidden">
+              <div className="divide-y divide-border/50 px-4" role="feed" aria-label="Article feed">
+                {displayedItems.map((item, index) => (
+                  <div key={item.id} aria-posinset={index + 1} aria-setsize={filteredItems.length}>
+                    <ArticleCard item={item} />
+                  </div>
+                ))}
+              </div>
+
+              {/* Load More Button */}
+              {hasMore && (
+                <div className="p-4 border-t border-border/50">
+                  <Button
+                    ref={loadMoreRef}
+                    variant="outline"
+                    className="w-full"
+                    onClick={handleLoadMore}
+                    aria-label={`Load more articles. ${filteredItems.length - displayCount} remaining`}
+                  >
+                    Load More ({filteredItems.length - displayCount} remaining)
+                  </Button>
+                </div>
+              )}
+            </Card>
+          )}
+        </section>
       </main>
 
       {/* Footer */}
-      <footer className="border-t border-border/40 mt-12">
+      <footer className="border-t border-border/40 mt-12" role="contentinfo">
         <div className="container mx-auto px-4 py-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4 text-sm text-muted-foreground">
             <p>
               TradersRSS - Financial news aggregated from trusted sources.
             </p>
-            <div className="flex items-center gap-4">
-              <Link
-                href="/"
-                className="hover:text-foreground transition-colors"
-              >
-                Home
-              </Link>
-              <a
-                href="#"
-                className="hover:text-foreground transition-colors"
-              >
-                About
-              </a>
-              <a
-                href="#"
-                className="hover:text-foreground transition-colors"
-              >
-                Privacy
-              </a>
-            </div>
+            <nav aria-label="Footer navigation">
+              <ul className="flex items-center gap-4">
+                <li>
+                  <Link
+                    href="/"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Home
+                  </Link>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    About
+                  </a>
+                </li>
+                <li>
+                  <a
+                    href="#"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Privacy
+                  </a>
+                </li>
+              </ul>
+            </nav>
           </div>
         </div>
       </footer>
@@ -673,9 +760,9 @@ export default function ArchivePage() {
           size="icon"
           className="fixed bottom-6 right-6 rounded-full shadow-lg z-50"
           onClick={handleScrollToTop}
+          aria-label="Scroll to top of page"
         >
-          <ArrowUp className="h-4 w-4" />
-          <span className="sr-only">Scroll to top</span>
+          <ArrowUp className="h-4 w-4" aria-hidden="true" />
         </Button>
       )}
     </div>

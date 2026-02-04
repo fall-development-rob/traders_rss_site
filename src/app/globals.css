@@ -151,7 +151,124 @@
 }
 
 @layer utilities {
-  /* Custom financial accent color utilities */
+  /* ==========================================================================
+     Accessibility Utilities
+     ========================================================================== */
+
+  /* Screen reader only - visually hidden but accessible */
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border-width: 0;
+  }
+
+  /* Skip link - visible on focus for keyboard navigation */
+  .skip-link {
+    position: fixed;
+    top: -100%;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9999;
+    padding: 1rem 1.5rem;
+    background-color: var(--primary);
+    color: var(--primary-foreground);
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: var(--radius);
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+    transition: top 0.2s ease-in-out;
+  }
+
+  .skip-link:focus {
+    top: 1rem;
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Focus ring styles - visible and consistent */
+  .focus-visible-ring:focus-visible,
+  *:focus-visible {
+    outline: 2px solid var(--ring);
+    outline-offset: 2px;
+  }
+
+  /* Custom focus ring for interactive elements */
+  .focus-ring {
+    @apply outline-none ring-offset-2 ring-offset-background focus-visible:ring-2 focus-visible:ring-ring;
+  }
+
+  /* High contrast focus for better visibility */
+  .focus-ring-high-contrast:focus-visible {
+    outline: 3px solid var(--ring);
+    outline-offset: 3px;
+    box-shadow: 0 0 0 6px rgba(var(--ring), 0.25);
+  }
+
+  /* ==========================================================================
+     Reduced Motion Support
+     ========================================================================== */
+
+  /* Respect user preference for reduced motion */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+
+    /* Keep essential transforms but remove animations */
+    .feed-card-hover:hover {
+      transform: none;
+    }
+
+    .animate-fade-in,
+    .animate-slide-up {
+      animation: none;
+    }
+  }
+
+  /* Utility to force motion for essential UI feedback */
+  .motion-safe {
+    @media (prefers-reduced-motion: no-preference) {
+      transition-property: transform, opacity;
+      transition-duration: 200ms;
+      transition-timing-function: ease-out;
+    }
+  }
+
+  /* ==========================================================================
+     High Contrast Mode Support
+     ========================================================================== */
+
+  @media (prefers-contrast: high) {
+    :root {
+      --border: #000000;
+      --ring: #000000;
+    }
+
+    .dark {
+      --border: #ffffff;
+      --ring: #ffffff;
+    }
+
+    /* Ensure sufficient contrast for focus indicators */
+    *:focus-visible {
+      outline-width: 3px;
+    }
+  }
+
+  /* ==========================================================================
+     Custom financial accent color utilities
+     ========================================================================== */
   .text-accent-gold {
     color: var(--fin-highlight);
   }
