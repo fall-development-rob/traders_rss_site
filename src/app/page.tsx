@@ -162,6 +162,14 @@ export default function Home() {
                 </li>
                 <li>
                   <Link
+                    href="/feeds"
+                    className="hover:text-foreground transition-colors"
+                  >
+                    Feeds
+                  </Link>
+                </li>
+                <li>
+                  <Link
                     href="/privacy"
                     className="hover:text-foreground transition-colors"
                   >
