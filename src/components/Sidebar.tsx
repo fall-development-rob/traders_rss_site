@@ -1,21 +1,16 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { TrendingUp, TrendingDown, Newspaper, Building2, Users, ExternalLink } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
+import { TrendingUp, TrendingDown, Newspaper, Building2, Users, ExternalLink, RefreshCw, AlertCircle } from "lucide-react";
 import { publishers } from "@/data/publishers";
 import { categoryLabels } from "@/hooks/useFeeds";
+import { useMarketData } from "@/hooks/useMarketData";
 import type { PublisherCategory } from "@/types";
-
-// Mock market data
-const marketData = [
-  { symbol: "SPY", name: "S&P 500", price: 5892.45, change: 0.87, isUp: true },
-  { symbol: "QQQ", name: "Nasdaq 100", price: 20456.78, change: 1.23, isUp: true },
-  { symbol: "DIA", name: "Dow Jones", price: 43567.89, change: -0.12, isUp: false },
-  { symbol: "IWM", name: "Russell 2000", price: 2234.56, change: 0.45, isUp: true },
-  { symbol: "VIX", name: "Volatility", price: 14.23, change: -3.45, isUp: false },
-];
 
 // Mock trending topics
 const trendingTopics = [
@@ -31,62 +26,169 @@ const categoriesWithPublishers = Array.from(
   new Set(publishers.map((p) => p.category))
 ).filter((cat) => categoryLabels[cat]) as PublisherCategory[];
 
+/**
+ * Loading skeleton for market data rows
+ */
+function MarketDataSkeleton() {
+  return (
+    <div className="space-y-3" role="status" aria-label="Loading market data">
+      {[1, 2, 3, 4, 5].map((i) => (
+        <div key={i} className="flex items-center justify-between py-1.5">
+          <div className="space-y-1.5">
+            <Skeleton className="h-4 w-12" />
+            <Skeleton className="h-3 w-20" />
+          </div>
+          <div className="space-y-1.5 text-right">
+            <Skeleton className="h-4 w-16 ml-auto" />
+            <Skeleton className="h-3 w-12 ml-auto" />
+          </div>
+        </div>
+      ))}
+      <span className="sr-only">Loading market data, please wait...</span>
+    </div>
+  );
+}
+
+/**
+ * Error display for market data fetch failures
+ */
+function MarketDataError({ message, onRetry }: { message: string; onRetry: () => void }) {
+  return (
+    <div
+      className="flex flex-col items-center justify-center py-4 text-center"
+      role="alert"
+      aria-live="polite"
+    >
+      <AlertCircle className="h-8 w-8 text-muted-foreground mb-2" aria-hidden="true" />
+      <p className="text-sm text-muted-foreground mb-3">{message}</p>
+      <Button
+        variant="outline"
+        size="sm"
+        onClick={onRetry}
+        aria-label="Retry loading market data"
+      >
+        <RefreshCw className="h-3 w-3 mr-1" aria-hidden="true" />
+        Retry
+      </Button>
+    </div>
+  );
+}
+
+/**
+ * Formats the last updated timestamp for display
+ */
+function formatLastUpdated(date: Date | null): string {
+  if (!date) return "";
+  const now = new Date();
+  const diffMs = now.getTime() - date.getTime();
+  const diffSeconds = Math.floor(diffMs / 1000);
+  const diffMinutes = Math.floor(diffSeconds / 60);
+
+  if (diffSeconds < 60) {
+    return "just now";
+  } else if (diffMinutes < 60) {
+    return `${diffMinutes}m ago`;
+  } else {
+    return date.toLocaleTimeString("en-US", {
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  }
+}
+
 function MarketTicker() {
+  const { quotes, isLoading, error, refresh, lastUpdated } = useMarketData();
+  const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const handleRefresh = async () => {
+    setIsRefreshing(true);
+    try {
+      await refresh();
+    } finally {
+      setIsRefreshing(false);
+    }
+  };
+
   return (
     <Card>
       <CardHeader className="pb-2">
-        <h2 className="text-sm font-semibold flex items-center gap-2">
-          <TrendingUp className="h-4 w-4" aria-hidden="true" />
-          Market Overview
-        </h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-sm font-semibold flex items-center gap-2">
+            <TrendingUp className="h-4 w-4" aria-hidden="true" />
+            Market Overview
+          </h2>
+          <Button
+            variant="ghost"
+            size="icon-xs"
+            onClick={handleRefresh}
+            disabled={isLoading || isRefreshing}
+            aria-label={isRefreshing ? "Refreshing market data" : "Refresh market data"}
+          >
+            <RefreshCw
+              className={`h-3 w-3 ${isRefreshing ? "animate-spin" : ""}`}
+              aria-hidden="true"
+            />
+          </Button>
+        </div>
+        {lastUpdated && !isLoading && !error && (
+          <p className="text-xs text-muted-foreground" aria-live="polite">
+            Last updated: {formatLastUpdated(lastUpdated)}
+          </p>
+        )}
       </CardHeader>
       <CardContent>
-        <table className="w-full" aria-label="Market data overview">
-          <thead className="sr-only">
-            <tr>
-              <th scope="col">Symbol and Name</th>
-              <th scope="col">Price</th>
-              <th scope="col">Change</th>
-            </tr>
-          </thead>
-          <tbody>
-            {marketData.map((item) => (
-              <tr
-                key={item.symbol}
-                className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0"
-              >
-                <td>
-                  <div className="font-medium text-sm">{item.symbol}</div>
-                  <div className="text-xs text-muted-foreground">{item.name}</div>
-                </td>
-                <td className="text-right">
-                  <div className="font-mono text-sm">
-                    {item.price.toLocaleString("en-US", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })}
-                  </div>
-                  <div
-                    className={`flex items-center justify-end gap-0.5 text-xs font-medium ${
-                      item.isUp ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
-                    }`}
-                    aria-label={`${item.isUp ? "Up" : "Down"} ${Math.abs(item.change).toFixed(2)} percent`}
-                  >
-                    {item.isUp ? (
-                      <TrendingUp className="h-3 w-3" aria-hidden="true" />
-                    ) : (
-                      <TrendingDown className="h-3 w-3" aria-hidden="true" />
-                    )}
-                    <span aria-hidden="true">
-                      {item.isUp ? "+" : ""}
-                      {item.change.toFixed(2)}%
-                    </span>
-                  </div>
-                </td>
+        {isLoading && quotes.length === 0 ? (
+          <MarketDataSkeleton />
+        ) : error && quotes.length === 0 ? (
+          <MarketDataError message="Unable to load market data" onRetry={handleRefresh} />
+        ) : (
+          <table className="w-full" aria-label="Market data overview">
+            <thead className="sr-only">
+              <tr>
+                <th scope="col">Symbol and Name</th>
+                <th scope="col">Price</th>
+                <th scope="col">Change</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {quotes.map((item) => (
+                <tr
+                  key={item.symbol}
+                  className="flex items-center justify-between py-1.5 border-b border-border/50 last:border-0"
+                >
+                  <td>
+                    <div className="font-medium text-sm">{item.symbol}</div>
+                    <div className="text-xs text-muted-foreground">{item.name}</div>
+                  </td>
+                  <td className="text-right">
+                    <div className="font-mono text-sm">
+                      {item.price.toLocaleString("en-US", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
+                    </div>
+                    <div
+                      className={`flex items-center justify-end gap-0.5 text-xs font-medium ${
+                        item.isUp ? "text-emerald-600 dark:text-emerald-400" : "text-red-600 dark:text-red-400"
+                      }`}
+                      aria-label={`${item.isUp ? "Up" : "Down"} ${Math.abs(item.changePercent).toFixed(2)} percent`}
+                    >
+                      {item.isUp ? (
+                        <TrendingUp className="h-3 w-3" aria-hidden="true" />
+                      ) : (
+                        <TrendingDown className="h-3 w-3" aria-hidden="true" />
+                      )}
+                      <span aria-hidden="true">
+                        {item.isUp ? "+" : ""}
+                        {item.changePercent.toFixed(2)}%
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </CardContent>
     </Card>
   );
