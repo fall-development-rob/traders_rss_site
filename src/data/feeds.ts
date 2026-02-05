@@ -522,6 +522,36 @@ export const feedSources: FeedSource[] = [
     feedCategory: 'RESEARCH',
     isActive: true,
   },
+
+  // Wealthfront
+  {
+    id: 'wealthfront-blog',
+    publisherId: 'wealthfront',
+    name: 'Wealthfront Blog',
+    url: 'https://www.wealthfront.com/blog/feed',
+    feedCategory: 'MARKET_COMMENTARY',
+    isActive: true,
+  },
+
+  // Betterment
+  {
+    id: 'betterment-resources',
+    publisherId: 'betterment',
+    name: 'Betterment Resources',
+    url: 'https://www.betterment.com/resources/rss.xml',
+    feedCategory: 'MARKET_COMMENTARY',
+    isActive: true,
+  },
+
+  // Empower (formerly Personal Capital)
+  {
+    id: 'empower-blog',
+    publisherId: 'empower',
+    name: 'Empower Blog',
+    url: 'https://www.empower.com/feed',
+    feedCategory: 'MARKET_COMMENTARY',
+    isActive: true,
+  },
 ];
 
 export const getFeedsByPublisher = (publisherId: string): FeedSource[] => {

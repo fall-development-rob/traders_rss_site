@@ -251,6 +251,32 @@ export const publishers: Publisher[] = [
     website: 'https://www.advisorperspectives.com',
   },
 
+  // RIA / Wealth Managers
+  {
+    id: 'wealthfront',
+    name: 'Wealthfront',
+    shortName: 'Wealthfront',
+    category: 'RIA',
+    brandColor: '#6B47ED',
+    website: 'https://www.wealthfront.com',
+  },
+  {
+    id: 'betterment',
+    name: 'Betterment',
+    shortName: 'Betterment',
+    category: 'RIA',
+    brandColor: '#1E88E5',
+    website: 'https://www.betterment.com',
+  },
+  {
+    id: 'empower',
+    name: 'Empower',
+    shortName: 'Empower',
+    category: 'RIA',
+    brandColor: '#00A651',
+    website: 'https://www.empower.com',
+  },
+
   // ASSET_MANAGER (Additional)
   {
     id: 'troweprice',
