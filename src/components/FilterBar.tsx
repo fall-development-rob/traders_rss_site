@@ -17,9 +17,9 @@ interface FilterBarProps {
 
 const allCategories: PublisherCategory[] = [
   "NEWS",
-  "ASSET_MANAGER",
   "BANK",
-  "PROP_TRADING",
+  "ASSET_MANAGER",
+  "RIA",
   "REGULATOR",
   "RESEARCH",
 ];
